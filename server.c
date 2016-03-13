@@ -58,7 +58,6 @@ int server_create(int port) {
 void server_run(int server_socket, int threads, int max_queue_size, char* exec_name) {
 	int i;
 	queue_t* queue;
-	pthread_t worker;
 	int client_socket;
 	struct sockaddr_in client_addr;
 	socklen_t client_len;

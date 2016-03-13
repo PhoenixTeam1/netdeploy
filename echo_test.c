@@ -3,19 +3,9 @@
 #include <string.h>
 
 int main() {
-	/*int c;
-	c = 0;
-	while (c != EOF) {
-		printf("Say something to me\n");
-		c = getchar();
-		getchar(); // dismiss carraige return
-		putchar(c);
-	}*/
-
 	char input[500];
 	while(fgets(input, 500, stdin)){  //read from STDIN (aka command-line)
 		printf("You sent:%s", input);  //print out what user typed in
-		fflush(0);
 		memset(input, 0, strlen(input));  //reset string to all 0's
 	}
 	return 0;
