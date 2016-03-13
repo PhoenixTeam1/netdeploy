@@ -24,7 +24,7 @@ void host_exec(int socket, char* exec_name) {
 		printf("Waiting for client %d to be finished\n", socket);
 		waitpid(pid, &status, 0);
 		printf("Client %d finished\n", socket);
-		//close(socket);
+		close(socket);
 		return;
 	}
 	// Child branch
