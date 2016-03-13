@@ -14,7 +14,8 @@ int main() {
 
 	char input[500];
 	while(fgets(input, 500, stdin)){  //read from STDIN (aka command-line)
-		printf("%s", input);  //print out what user typed in
+		printf("You sent:%s", input);  //print out what user typed in
+		fflush(0);
 		memset(input, 0, strlen(input));  //reset string to all 0's
 	}
 	return 0;

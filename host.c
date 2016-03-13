@@ -20,7 +20,7 @@ void host_exec(int socket, char* exec_name) {
 		printf("Waiting for client %d to be finished\n", socket);
 		waitpid(pid, &status, 0);
 		printf("Client %d finished\n", socket);
-		close(socket);
+		//close(socket);
 		return;
 	}
 	// Child branch
@@ -30,6 +30,8 @@ void host_exec(int socket, char* exec_name) {
 	if (dup(socket) != STDIN_FILENO || dup(socket) != STDOUT_FILENO || dup(socket) != STDERR_FILENO) {
 		perror("Error duplicating socket for stdin/out/err");
 	}
+	printf("Connected to binary: %s\n", exec_name);
+	fflush(stdout);
 	// Clean this up XXX
 	execl(exec_name, exec_name, NULL);
 	return;
