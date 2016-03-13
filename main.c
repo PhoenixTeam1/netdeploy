@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <argp.h>
+#include "server.h"
+
+#define DEFAULT_THREAD_COUNT	10
+#define DEFAULT_PORT		8888
+
+static error_t parse_opt(int key, char* arg, struct argp_state* state);
+
+const char* argp_progam_version = "0.1";
+const char* argp_program_bug_address = "mark@markoneill.name";
+static char doc[] = "\n\
+Netdeploy by Mark O\'Neill\n\n\
+A tool that enables local applications that use stdin/out to be deployed within \
+a network context, allowing users to access them remotely. Operation is similar \
+to \"netcat -e\" but provides support for multiple simultaneous instances of the \
+target program to be accessed by multiple clients, via threading.";
+static char args_doc[] = "FILENAME";
+
+static struct argp_option options[] = {
+	{"threads",	't',	"COUNT",	0, \
+"(optional) Size of thread pool, which correlates to number of simultaneous users (default 10)"},
+	{"port",	'p',	"PORT",		0, \
+"(optional) Port to listen on (default 8888)"},
+	{ 0 }
+};
+
+typedef struct arguments_t {
+	char* exec_name;
+	unsigned int num_threads;
+	int port;
+} arguments_t;
+
+static struct argp argp = {options, parse_opt, args_doc, doc};
+
+int main(int argc, char* argv[]) {
+	int server_socket;
+	arguments_t args;
+
+	// Defaults
+	args.exec_name = NULL;
+	args.num_threads = DEFAULT_THREAD_COUNT;
+	args.port = DEFAULT_PORT;
+
+	argp_parse(&argp, argc, argv, 0, 0, &args);
+	printf("Deploying executable %s on port %d with thread pool size of %d\n", 
+		args.exec_name, args.port, args.num_threads);
+	server_socket = server_create(args.port);
+	server_run(server_socket, args.num_threads, args.num_threads, args.exec_name);
+	return EXIT_SUCCESS;
+}
+
+static error_t parse_opt(int key, char* arg, struct argp_state* state) {
+	struct arguments_t* arguments = state->input;
+	switch(key) {
+		case 't':
+			arguments->num_threads = arg ? atoi(arg) : DEFAULT_THREAD_COUNT;
+			break;
+		case 'p':
+			arguments->port = arg ? atoi(arg) : DEFAULT_PORT;
+			break;
+		case ARGP_KEY_ARG: /* Normal arguments here */
+			if (state->arg_num >= 1) {
+				argp_usage(state);
+			}
+			arguments->exec_name = arg;
+			break;
+		case ARGP_KEY_END:
+			if (state->arg_num < 1) {
+				argp_usage(state);
+			}
+			break;
+		default:
+			return ARGP_ERR_UNKNOWN;
+	}
+	return 0;
+}
+
