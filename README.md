@@ -24,6 +24,10 @@ However, Netdeploy differs in several noteworthy ways:
   fprintf, etc.) to call fflush(). This allows hosted applications
   to be more interactive.
 
+Netdeploy was inspired by the need for ethical hacking competitions
+to host arbitrary vulnerable binaries for remote exploitation. It is
+therefore intended for but not limited to this purpose.
+
 Since Netdeploy allows arbitrary programs to be run by the user it is
 imperative that these applications be vetted beforehand to ensure there
 is no risk to the host machine if the hosted application is subject to
