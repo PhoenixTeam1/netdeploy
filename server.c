@@ -106,7 +106,8 @@ void* thread_loop(void* data) {
 	exec_name = params->exec_name;
 	while (1) {
 		client = (int)dequeue(queue);
-		host_exec(client, exec_name);
+		while (host_exec(client, exec_name) == 1) {};
+		close(client);
 	}
 	return NULL;
 
