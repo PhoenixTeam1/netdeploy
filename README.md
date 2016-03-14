@@ -42,7 +42,7 @@ Netdeploy uses pthreads for threading and the LD\_PRELOAD trick for
 forcing hosted applications to flush their output buffers when writing
 to an output stream. Thus it will work best on Linux but should 
 provide basic functionality on other operating systems (assuming they
-have sufficient POSIX support. Note that Netdeploy has not yet been 
+have sufficient POSIX support). Note that Netdeploy has not yet been 
 tested on any system besides Linux.
 
 
