@@ -18,7 +18,7 @@ A tool that enables local applications that use stdin/out to be deployed within 
 a network context, allowing users to access them remotely. Operation is similar \
 to \"netcat -e\" but provides support for multiple simultaneous instances of the \
 target program to be accessed by multiple clients, via threading.";
-static char args_doc[] = "FILENAME";
+static char args_doc[] = "prog-and-args";
 
 static struct argp_option options[] = {
 	{"threads",	't',	"COUNT",	0, \
