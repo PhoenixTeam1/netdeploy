@@ -13,17 +13,16 @@ int setvbuf(FILE *stream, char *buf, int mode, size_t size) {
 }
 
 int printf(const char* format, ...) {
-	va_list list;
-	char* parg;
+	va_list args;
 	int ret;
 	typeof(printf) *orig_printf;
-	va_start(list, format);
-	vasprintf(&parg, format, list);
-	va_end(list);
+	va_start(args, format);
+	ret = vprintf(format, args);
+	va_end(args);
 	orig_printf = dlsym(RTLD_NEXT, "printf");
 	//(*orig_printf)("Overriding printf\n");
-	ret = (*orig_printf)("%s", parg);
-	free(parg);
 	fflush(0); // Force application to flush buffer after every printf
 	return ret; 
 }
+
+// XXX add more overrides as necessary (fprintf for example)
