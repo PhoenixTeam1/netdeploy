@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include "server.h"
 #include "queue.h"
 #include "host.h"
@@ -12,6 +13,7 @@
 typedef struct thread_param_t {
 	queue_t* queue;
 	char* exec_name;
+	char** exec_args;
 } thread_param_t;
 
 static void* thread_loop(void* data);
@@ -51,11 +53,15 @@ int server_create(int port) {
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
+
+	// Signal handling
+	signal(SIGPIPE, SIG_IGN);
+
 	printf("Server socket bound and listening\n");
 	return server_socket;
 }
 
-void server_run(int server_socket, int threads, int max_queue_size, char* exec_name) {
+void server_run(int server_socket, int threads, int max_queue_size, char* exec_name, char** exec_args) {
 	int i;
 	queue_t* queue;
 	int client_socket;
@@ -73,6 +79,7 @@ void server_run(int server_socket, int threads, int max_queue_size, char* exec_n
 	for (i = 0; i < threads; i++) {
 		params[i].queue = queue;
 		params[i].exec_name = exec_name;
+		params[i].exec_args = exec_args;
 		pthread_create(&thread_pool[i], NULL, thread_loop, (void*)&params[i]);
 	}
 
@@ -100,13 +107,15 @@ void server_run(int server_socket, int threads, int max_queue_size, char* exec_n
 void* thread_loop(void* data) {
 	int client;
 	char* exec_name;
+	char** exec_args;
 	queue_t* queue;
 	thread_param_t* params = (thread_param_t*)data;
 	queue = params->queue;
+	exec_args = params->exec_args;
 	exec_name = params->exec_name;
 	while (1) {
 		client = (int)dequeue(queue);
-		while (host_exec(client, exec_name) == 1) {};
+		while (host_exec(client, exec_name, exec_args) == 1) {};
 		close(client);
 	}
 	return NULL;

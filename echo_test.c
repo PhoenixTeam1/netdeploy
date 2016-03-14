@@ -4,8 +4,11 @@
 
 int main() {
 	char input[500];
-	while(fgets(input, 500, stdin)){  //read from STDIN (aka command-line)
+	int i;
+	i = 5;
+	while(i > 0 && fgets(input, 500, stdin)){  //read from STDIN (aka command-line)
 		printf("You sent:%s", input);  //print out what user typed in
+		printf("I will echo %d more times\n",--i);
 		memset(input, 0, strlen(input));  //reset string to all 0's
 	}
 	return 0;

@@ -16,14 +16,13 @@ static int recv_comm(int socket, unsigned char* buffer, int length);
 static int recv_comm_until(int socket, unsigned char** buffer, char* needle);
 static int send_comm(int socket, unsigned char* buffer, int length);
 
-int host_exec(int socket, char* exec_name) {
+int host_exec(int socket, char* exec_name, char** exec_args) {
 	int status;
 	int ret;
 	int flag;
 	char restart_prompt[] = "[netdeploy] Restart process? (y/n): ";
 	char exit_message[1024];
 	char* answer_buf;
-	char* env[] = {"LD_PRELOAD=./custom_links.so",NULL};
 	int pid = fork();
 	flag = 1;
 	if (pid < 0) {
@@ -73,9 +72,10 @@ int host_exec(int socket, char* exec_name) {
 	}
 	printf("[netdeploy] Connected to binary \"%s\"\n", exec_name);
 	fflush(stdout);
-	// XXX add proper env and args (requires taking more args from main.c)
-	// add failure checks
-	execle(exec_name, exec_name, NULL, env);
+	setenv("LD_PRELOAD","./custom_links.so", 1);
+	execv(exec_name, exec_args);
+	perror("execv");
+	exit(EXIT_FAILURE);
 	return 0;
 }
 

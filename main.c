@@ -8,8 +8,9 @@
 #define DEFAULT_PORT		8888
 
 static error_t parse_opt(int key, char* arg, struct argp_state* state);
+static void print_exec_args(char** argv);
 
-const char* argp_progam_version = "0.1";
+const char* argp_program_version = "0.1";
 const char* argp_program_bug_address = "mark@markoneill.name";
 static char doc[] = "\n\
 Netdeploy by Mark O\'Neill\n\n\
@@ -29,6 +30,7 @@ static struct argp_option options[] = {
 
 typedef struct arguments_t {
 	char* exec_name;
+	char** exec_args;
 	unsigned int num_threads;
 	int port;
 } arguments_t;
@@ -47,12 +49,14 @@ int main(int argc, char* argv[]) {
 	argp_parse(&argp, argc, argv, 0, 0, &args);
 	printf("Deploying executable %s on port %d with thread pool size of %d\n", 
 		args.exec_name, args.port, args.num_threads);
+	print_exec_args(args.exec_args);
 	server_socket = server_create(args.port);
-	server_run(server_socket, args.num_threads, args.num_threads, args.exec_name);
+	server_run(server_socket, args.num_threads, args.num_threads, args.exec_name, args.exec_args);
 	return EXIT_SUCCESS;
 }
 
-static error_t parse_opt(int key, char* arg, struct argp_state* state) {
+error_t parse_opt(int key, char* arg, struct argp_state* state) {
+	char* slash;
 	struct arguments_t* arguments = state->input;
 	switch(key) {
 		case 't':
@@ -62,10 +66,15 @@ static error_t parse_opt(int key, char* arg, struct argp_state* state) {
 			arguments->port = arg ? atoi(arg) : DEFAULT_PORT;
 			break;
 		case ARGP_KEY_ARG: /* Normal arguments here */
-			if (state->arg_num >= 1) {
-				argp_usage(state);
+			if (state->arg_num == 0) {
+				arguments->exec_name = arg;
+				arguments->exec_args = &state->argv[(state->next)-1];
+				// remove path from first arg
+				slash = strrchr(arguments->exec_args[0], '/');
+				if (slash) arguments->exec_args[0] = slash+1;
+				state->next = state->argc; // end parsing of arguments
+				// (the rest are all for the hosted process)
 			}
-			arguments->exec_name = arg;
 			break;
 		case ARGP_KEY_END:
 			if (state->arg_num < 1) {
@@ -76,5 +85,17 @@ static error_t parse_opt(int key, char* arg, struct argp_state* state) {
 			return ARGP_ERR_UNKNOWN;
 	}
 	return 0;
+}
+
+void print_exec_args(char** argv) {
+	char* cur_arg;
+	int i;
+	i = 0;
+	printf("Hosted executable arguments are");
+	while ((cur_arg = argv[i++]) != NULL) {
+		printf(" %s", cur_arg);
+	}
+	printf("\n");
+	return;
 }
 
