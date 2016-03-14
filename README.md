@@ -1,4 +1,4 @@
-# Netdeploy - threaded deployment of local terminal applications through a network interface
+# Netdeploy - threaded deployment of local terminal applications to the network
 Copyright (C) 2016, [Mark O'Neill](//markoneill.name/).  
 
 
@@ -82,7 +82,7 @@ https://github.com/PhoenixTeam1/netdeploy
 
 ## License
 
-Netdeploy is released under the GNU Lesser General Public Licence v2.1.
+Netdeploy is released under the GNU Lesser General Public License v2.1.
 
 
 ## Contributors
