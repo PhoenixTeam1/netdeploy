@@ -21,6 +21,7 @@ static void* thread_loop(void* data);
 int server_create(int port) {
 	int server_socket;
 	struct sockaddr_in server_addr;
+        struct sigaction sigact;
 	int reuse = 1;
 
 	// setup socket address structure
@@ -55,7 +56,9 @@ int server_create(int port) {
 	}
 
 	// Signal handling
-	signal(SIGPIPE, SIG_IGN);
+        memset(&sigact, 0, sizeof(sigact));
+        sigact.sa_handler = SIG_IGN;
+        sigaction(SIGPIPE, &sigact, NULL);
 
 	printf("Server socket bound and listening\n");
 	return server_socket;
