@@ -109,14 +109,13 @@ queue_node_t* make_queue_node(void* data) {
  */
 int enqueue(queue_t* queue, void* data) {
 	queue_node_t* new_node;
-	pthread_mutex_lock(&queue->mutex);
 	new_node = make_queue_node(data);
 	if (new_node == NULL) {
-		pthread_mutex_unlock(&queue->mutex);
 		return 0;
 	}
 
 	sem_wait(queue->limit_sem);
+	pthread_mutex_lock(&queue->mutex);
 	// If queue is empty
 	if (queue->head == NULL) {
 		assert(queue->tail == NULL);
